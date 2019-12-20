@@ -7,6 +7,6 @@ SQL database (SQLite3) for invoice input. The Google Doc's API is used to create
 the invoice.
 
 #### Usage
-python docs/create_invoice.py
+`python docs/create_invoice.py`
 
 
