@@ -62,15 +62,17 @@ def cal_events():
     # Call the Calendar API
     ########## CANT GET DATE TIME TO PICKLE?
     # dt_last_exe = datetime.strptime(get_last_exe(), "%d/%m/%Y %H:%M:%S")
+    # print()
     # last_exe = dt_last_exe.isoformat() + 'Z'
-    # print(last_exe)
+    last_exe = get_last_exe()
 
-    # ## TEMP until last exe fn fixed
-    last_exe = datetime(2019, 12, 7).isoformat() + 'Z' 
+    print(f"Last executed: {last_exe}")
+
+    # Date for Testing
+    # last_exe = datetime(2019, 12, 19).isoformat() + 'Z' 
 
     now = datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    # set date to 2016
-    # now = datetime.datetime(2016, 1, 1, 16, 30).isoformat() + 'Z'
+
     print(now)
     print('Getting the upcoming 10 events')
     events_result = service.events().list(calendarId='primary', timeMin=last_exe,

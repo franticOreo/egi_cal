@@ -46,6 +46,7 @@ def get_expenses(cust_dict):
     """
     more_expenses = True
     count = 0
+    cust_dict['expenses'] = {}
 
     while more_expenses==True:
         are_there = input('Are there any expenses for the job: {} on the {}? y/N'.format(cust_dict['name'], cust_dict["date-of-work"]))
@@ -53,9 +54,11 @@ def get_expenses(cust_dict):
 
         if are_there == 'y':
             key = 'expense' + str(count)
-            cust_dict[key] = input()
-        if are_there == 'N':
-            more_expenses = False
+            expense_no = input(f"[1] Glyphosate \n [2] Seasol \n [3] Other")
+            if expense_no == 1:
+                cust_dict['expenses'][key] =  
+        # if are_there == 'N':
+        #     more_expenses = False
 
 
 
