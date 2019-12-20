@@ -1,0 +1,11 @@
+trying to get current date with date timr for google 
+
+KeyboardInterrupt
+>>> import pickle
+>>> with open('last_exe.pickle','wb') as file:
+...     pickle.dump(datetime(2019, 17, 11),file)
+... 
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+TypeError: 'module' object is not callable
+>>> 
