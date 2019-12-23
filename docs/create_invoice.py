@@ -7,6 +7,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 from google.oauth2 import service_account
+import json
 
 import sys
 # relative import 
@@ -37,11 +38,52 @@ def input_invoice_data(cust_dict, title):
     result = doc_service.documents().batchUpdate(
         documentId=invoice_copy_id, body={'requests': requests}).execute()
 
+    # if invoice has expenses, create new table rows and insert total
+    if len(cust_dict['expenses']) > 1:
+        print(json.dumps(document, indent=4, sort_keys=True))
+        # expense_requests = arrange_expenses(cust_dict['expenses']) 
+
+        # result = doc_service.documents().batchUpdate(
+        #     documentId=invoice_copy_id, body={'requests': expense_requests}).execute()
+
+
+    # check for unfilled text entries in invoice, if empty 
+
+def arrange_expenses(expenses_dict):
+    # for every expense create a new row with expense name
+    # and its price
+
+    requests = [{
+        'insertText': {
+          'location': {
+            'index': 205
+          },
+          'text': 'Hello'
+      }
+    },
+    {
+      'insertTableRow': {
+          'tableCellLocation': {
+              'tableStartLocation': {
+                      'index': 2
+              },
+              'rowIndex': 1,
+              'columnIndex': 1
+          },
+          'insertBelow': 'true'
+      }
+    }
+    ]
+    return requests
+
+
+
+
 
 
 def get_expenses(cust_dict):
     """Asks user for quantity, type of expense and cost. It adds these
-    to the customer dictionary.
+    to the expense dictionary inside customer dictionary.
     Ask user if expenses, if so ask for data else break.
     """
     more_expenses = True
@@ -50,15 +92,41 @@ def get_expenses(cust_dict):
 
     while more_expenses==True:
         are_there = input('Are there any expenses for the job: {} on the {}? y/N'.format(cust_dict['name'], cust_dict["date-of-work"]))
-# NEEEEEEEEEEEEEEDS WORK
 
         if are_there == 'y':
-            key = 'expense' + str(count)
-            expense_no = input(f"[1] Glyphosate \n [2] Seasol \n [3] Other")
+            key = 'expense_' + str(count)
+            expense_no = int(input(f"\n [1] Glyphosate \n [2] Seasol \n [3] Other"))
+            # print(expense_no == 2)
+            # print(type(expense_no))
             if expense_no == 1:
-                cust_dict['expenses'][key] =  
-        # if are_there == 'N':
-        #     more_expenses = False
+                print(key)
+                cust_dict['expenses'][key+'_name'] = 'Glyphosate'
+                cust_dict['expenses'][key+'_cost'] = 10
+            if expense_no == 2:
+                print(key)
+                # print('exp2')
+                cust_dict['expenses'][key+'_name'] = 'Seasol'
+                cust_dict['expenses'][key+'_cost'] = 10
+                # print(1, cust_dict['expenses'])
+
+            if expense_no == 3:
+                cust_dict['expenses'][key+'_name'] = 'Other'
+                cust_dict['expenses'][key+'_cost'] = 0 # bad  
+            count += 1  
+        if are_there == 'N':
+            more_expenses = False
+            # print(2,cust_dict['expenses'])
+            cust_dict['expenses']['expense_total'] = compute_expense_total(cust_dict['expenses'])
+            print(cust_dict['expenses'])
+
+def compute_expense_total(expenses_dict):
+    total = 0
+    for expense in expenses_dict.values():
+        if isinstance(expense, str) == True:
+            continue
+        else:
+            total += expense
+    return total 
 
 
 
@@ -66,7 +134,7 @@ def get_expenses(cust_dict):
 def arrange_requests(cust_dict):
     """
     Creates a request object in JSON form for the Google Docs API
-    """
+    """    
     expenses = get_expenses(cust_dict)
 
     inv_num = title.split('-')[0]
@@ -193,18 +261,6 @@ def create_new_invoice(title):
 
     return invoice_copy_id, creds
 
-# DEBUGGING STOLEN FROM STACK OVERFLOW
-# import dis
-# def list_func_calls(fn):
-#     funcs = []
-#     bytecode = dis.Bytecode(fn)
-#     instrs = list(reversed([instr for instr in bytecode]))
-#     for (ix, instr) in enumerate(instrs):
-#         if instr.opname=="CALL_FUNCTION":
-#             load_func_instr = instrs[ix + instr.arg + 1]
-#             funcs.append(load_func_instr.argval)
-
-#     return ["%d. %s" % (ix, funcname) for (ix, funcname) in enumerate(reversed(funcs), 1)]
 
 
 
