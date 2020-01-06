@@ -2,8 +2,8 @@
 ###### Creates Google Doc Invoices for my business, Eli's Garden Improvements
 
 #### Overview
-These scripts reads past calendar entries, matches the customers information to a
-SQL database (SQLite3) for invoice input. The Google Doc's API is used to create
+This project reads past calendar entries, parses and matches the customers information to a
+SQL database (SQLite3) to gather invoice input. The Google Doc's API is used to create
 the invoice.
 
 #### Usage
