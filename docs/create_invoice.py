@@ -38,13 +38,16 @@ def input_invoice_data(cust_dict, title):
     result = doc_service.documents().batchUpdate(
         documentId=invoice_copy_id, body={'requests': requests}).execute()
 
+
+    document = doc_service.documents().get(documentId=invoice_copy_id).execute()
+    print(json.dumps(document, indent=4, sort_keys=True))
     # if invoice has expenses, create new table rows and insert total
     if len(cust_dict['expenses']) > 1:
-        print(json.dumps(document, indent=4, sort_keys=True))
-        # expense_requests = arrange_expenses(cust_dict['expenses']) 
+        
+        expense_requests = arrange_expenses(cust_dict['expenses']) 
 
-        # result = doc_service.documents().batchUpdate(
-        #     documentId=invoice_copy_id, body={'requests': expense_requests}).execute()
+        result = doc_service.documents().batchUpdate(
+            documentId=invoice_copy_id, body={'requests': expense_requests}).execute()
 
 
     # check for unfilled text entries in invoice, if empty 
@@ -56,7 +59,7 @@ def arrange_expenses(expenses_dict):
     requests = [{
         'insertText': {
           'location': {
-            'index': 205
+            'index': 180
           },
           'text': 'Hello'
       }
@@ -65,10 +68,10 @@ def arrange_expenses(expenses_dict):
       'insertTableRow': {
           'tableCellLocation': {
               'tableStartLocation': {
-                      'index': 2
+                      'index': 177
               },
-              'rowIndex': 1,
-              'columnIndex': 1
+              'rowIndex': 3,
+              'columnIndex': 2
           },
           'insertBelow': 'true'
       }
