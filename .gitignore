@@ -1,4 +1,6 @@
 /home/franticoreo/egi_cal/token.pickle
+/home/franticoreo/egi_cal/credentials.json
+/home/franticoreo/egi_cal/docs_credentials.json
 ./docs/credentials.json
 ./docs/creds_client_config.json
 ./docs/drive_token.pickle
