@@ -70,8 +70,8 @@ def arrange_expenses(expenses_dict):
               'tableStartLocation': {
                       'index': 177
               },
-              'rowIndex': 3,
-              'columnIndex': 2
+              'rowIndex': 1,
+              'columnIndex': 3
           },
           'insertBelow': 'true'
       }

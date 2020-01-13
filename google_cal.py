@@ -64,12 +64,12 @@ def cal_events():
     # dt_last_exe = datetime.strptime(get_last_exe(), "%d/%m/%Y %H:%M:%S")
     # print()
     # last_exe = dt_last_exe.isoformat() + 'Z'
-    last_exe = get_last_exe()
+    # last_exe = get_last_exe()
 
-    print(f"Last executed: {last_exe}")
+    # print(f"Last executed: {last_exe}")
 
     # Date for Testing
-    # last_exe = datetime(2019, 12, 19).isoformat() + 'Z' 
+    last_exe = datetime(2019, 12, 19).isoformat() + 'Z' 
 
     now = datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
 
