@@ -7,4 +7,5 @@
 ./docs/gmail_creds.json
 ./docs/new_drive_creds.json
 ./docs/OAuth.json
-./docs/token.pickle 
+./docs/token.pickle
+./sqlite/db
