@@ -9,3 +9,5 @@
 ./docs/OAuth.json
 ./docs/token.pickle
 ./sqlite/db
+./Invoices
+*.pickle
