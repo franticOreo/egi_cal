@@ -20,8 +20,7 @@ SCOPES = ['https://www.googleapis.com/auth/documents.readonly',
 
 # The ID of a sample document.
 DOCUMENT_ID = '1c3dW6AfZv__YJNcvqicRPffCebgvBuhoW93GhCaHYwY'
-
-
+DRIVE_CREDS = '/home/franticoreo/egi_cal/drive_credentials.pickle'
 
 
 def input_invoice_data(cust_dict, title):
@@ -222,7 +221,7 @@ def create_invoice_title(inv_info):
 
 def increment_num():
     # increment invoice number from txt file
-    with open('invoice_number.txt', 'r') as curr_num:
+    with open('/home/franticoreo/egi_cal/docs/invoice_number.txt', 'r') as curr_num:
         current_number = curr_num.read()
         print(current_number)
         with open('invoice_number.txt', 'w') as new_num:
@@ -237,8 +236,8 @@ def create_new_invoice(title):
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('drive_token.pickle'):
-        with open('drive_token.pickle', 'rb') as token:
+    if os.path.exists(DRIVE_CREDS):
+        with open(DRIVE_CREDS, 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -246,10 +245,10 @@ def create_new_invoice(title):
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'creds_client_config.json', SCOPES)
+                'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('drive_token.pickle', 'wb') as token:
+        with open(DRIVE_CREDS, 'wb') as token:
             pickle.dump(creds, token)
 
     drive_service = build('drive', 'v3', credentials=creds)

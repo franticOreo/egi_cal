@@ -3,16 +3,18 @@ import re, os
 import csv
 from datetime import datetime
 import pickle
+from pprint import pprint
 
-# doc = docx.Document('Copy of Tax Invoice for Egons GC Dec.docx')
+
 
 def main():
     # get_cust_info()
-    list_of_cust = get_cust_info()
-    clean_cust_info(list_of_cust)
+    list_of_cust = get_data_from_invoices()
+    # unique_customers(list_of_cust)
+    # clean_cust_info(list_of_cust)
 
 
-def get_cust_info():
+def get_data_from_invoices():
     '''
     This function iterates of the Invoices directory, finds the document files.
     It then creates a docx Document object of the file in order to read the text.
@@ -22,44 +24,49 @@ def get_cust_info():
     '''
 
     inv_dir = r'/home/franticoreo/egi_cal/Invoices/'
-    list_of_cust = []
-
-
-
+    list_of_inv = []
+    inv_with_error = []
 
     for filename in os.listdir(inv_dir):
         if filename.endswith('.docx'):
             doc = docx.Document(inv_dir + filename)
             fp = doc.paragraphs[0].text
 
-
-
             # get date of work from first paragraph
-            # date = get_date(fp, filename) 
+            date = get_date(fp, filename)
             rate = get_rate_from_table(doc, filename)
 
-
+            invoice_d = {}
             try:
                 # get a string of customer info after "To :" in invoice
                 after_to = fp.split('To :')[1]
                 # remove words after the word "Scope"
                 customer_info = after_to.split('Scope')[0]
+                # creates an array [name, address, suburb] by splitting by a comma
                 customer_info = customer_info.split(',')
-                customer_info.append(rate)
+                invoice_d['name'] = customer_info[0].strip()
+                invoice_d['email'] = get_cust_email(invoice_d['name'])
+                invoice_d['address'] = customer_info[1]
+                invoice_d['suburb'] = customer_info[2].rstrip()
+                invoice_d['rate'] = rate
+                invoice_d['date'] = date
                 # customer_info.append(date)
-                list_of_cust.append(customer_info)
-
-                # print(list_of_cust)
-                # list_of_cust.append(rate)
+                list_of_inv.append(invoice_d)
 
             except:
                 print('Error handling Invoice: '+ filename)
-    # print(list_of_cust)
-    return list_of_cust
+                inv_with_error.append(filename)
+    print(list_of_inv)
+    print('Following invoices were unable to extracted...')
+    pprint(inv_with_error)
+
+    return list_of_inv
+
+
 
 
 def get_cust_email(name):
-    with open('/home/franticoreo/egi_cal/docs/clean_entries.txt', 'rb') as file:
+    with open('docs/clean_entries.txt', 'rb') as file:
         subj_recip = pickle.load(file)
         # print(subj_recip)
     # read through list of dicts
@@ -71,7 +78,7 @@ def get_cust_email(name):
             return email
 
 
-def get_date(filename):
+def get_date(paragraph, filename):
     """Creates a datetime object from date text in invoice paragraph
 
     Args:
@@ -79,9 +86,6 @@ def get_date(filename):
     Returns:
         datetime object
     """
-    if filename.endswith('.docx'):
-        doc = docx.Document(inv_dir + filename)
-        paragraph = doc.paragraphs[0].text
     try:
         date = paragraph.split('From:')[0].split('Date:')[1].strip()
         if len(date) > 8:
@@ -98,20 +102,19 @@ def get_date(filename):
         print('Error finding date for: ', filename)
         print(e)
 
-def get_last_time_worked(filename, customer_list):
+def get_last_time_worked():
     """Gets the last date of work for each customer in list
-    
-    Args:
-        filename: string
-        customer_list: list
-    Returns:
-        last_work_date: dictionary {name, datetime}
+
     """
-    customer_list = clean_cust_info(customer_list)
+    inv_list = get_data_from_invoices()
+    # go through invoice data get customer name and date
+    # if customer seen, check if date is later
+    cust_and_date = []
 
-
-
-
+    for inv_d in inv_list:
+        cust_and_date['name'] = inv_d['name']
+        cust_and_date['date'] = inv_d['date']
+        
 
     
 
@@ -122,7 +125,6 @@ def get_rate_from_table(doc, filename):
     the type float, the rate is computed. A lambda function is used to standardise the 
     rate to be either 35 or 50.
     '''
-    print(filename)
     table = doc.tables[0]
 
     # get quantity of hours
@@ -158,45 +160,24 @@ def get_rate_from_table(doc, filename):
     print(total_cost, hours)
     return (total_cost, hours)
 
-def clean_cust_info(customer_list):
-    '''
-    This function recieves a list of customer arrays , if the array fits
-    the standard structure [name, address, suburb] it is then cleaned by removing
-    white space and concatenating the address and suburb. These arrays are then converted
-    into tuples to be able to added to a set. Therefore, the set removes repeated entries.
-    '''
 
-    unique_cust = set()
-    dirty_cust = []
+def unique_customers(list_of_inv):
+    unique_cust = []
 
-    for customer_array in customer_list:
-        try:
-            name = customer_array[0].strip()
-            email = get_cust_email(name)
-            # remove trailing whitespace from suburb item with rstrip method
-            suburb = str(customer_array[2]).rstrip()
-            address = str(customer_array[1]) 
-            rate = str(customer_array[-1])
-            # print(customer_array)
-            # get customer entry, create a tuple(unhashable) to the set
-            l = (name, address, suburb, rate, email)
-            unique_cust.add(l)
 
-        except Exception as e:
-            print('Error handling Customer: '+ str(customer_array))
-            print(e)
-            dirty_cust.append(customer_array)
-            
-    print('Dirty Customers:')
-    print(dirty_cust)
+    for cust_d in list_of_inv:
+        # remove date to only retain customer info
+        del cust_d['date']
+        if cust_d in unique_cust:
+            continue
+        else:
+            unique_cust.append(cust_d)
 
     print('Clean, Unique Customers:')
     print()
     print(unique_cust)
+    print(len(unique_cust))
     return unique_cust
-
-
-
 
 if __name__ == '__main__':
     main()

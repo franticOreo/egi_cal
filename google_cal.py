@@ -43,33 +43,29 @@ def cal_events():
 
     events_info = []
 
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists('credentials.pickle'):
+        with open('credentials.pickle', 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            print(True)
+            flow = InstalledAppFlow.from_client_secrets_file('/home/franticoreo/egi_cal/credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
+        with open('credentials.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
     service = build('calendar', 'v3', credentials=creds)
+    # get the last time I used this program
+    last_exe = get_last_exe()
 
-    # Call the Calendar API
-    ########## CANT GET DATE TIME TO PICKLE?
-    # dt_last_exe = datetime.strptime(get_last_exe(), "%d/%m/%Y %H:%M:%S")
-    # print()
-    # last_exe = dt_last_exe.isoformat() + 'Z'
-    # last_exe = get_last_exe()
-
-    # print(f"Last executed: {last_exe}")
+    print(f"Last executed: {last_exe}")
 
     # Date for Testing
-    last_exe = datetime(2019, 12, 19).isoformat() + 'Z' 
+    # last_exe = datetime(2019, 12, 19).isoformat() + 'Z' 
 
     now = datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
 
@@ -101,9 +97,6 @@ def get_last_exe():
     with open('/home/franticoreo/egi_cal/last_exe.pickle', 'rb') as file:
         last_exe = pickle.load(file)
     return last_exe
-
-
-
 
 
 def relevant_event_info(event):

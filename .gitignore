@@ -1,5 +1,5 @@
-./credentials.json
-./sqlite/db
-./Invoices
+credentials.json
+sqlite/db
+Invoices
 *.pickle
 ./docs/*.pickle
